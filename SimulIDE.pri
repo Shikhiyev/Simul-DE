@@ -122,6 +122,7 @@ HEADERS += \
     ./src/gui/QPropertyEditor/QPropertyModel.h \
     ./src/gui/QPropertyEditor/QVariantDelegate.h \
     ./src/gui/QPropertyEditor/propertieswidget.h \
+    ./src/gui/circuitwidget/addpartdialog.h \
     ./src/gui/circuitwidget/chip.h \
     ./src/gui/circuitwidget/circuit.h \
     ./src/gui/circuitwidget/circuitview.h \
@@ -213,6 +214,7 @@ HEADERS += \
     ./src/gui/circuitwidget/components/sources/rail.h \
     ./src/gui/circuitwidget/components/sources/voltsource.h \
     ./src/gui/circuitwidget/components/sources/wavegen.h \
+    ./src/gui/circuitwidget/components/switches/joystick.h \
     ./src/gui/circuitwidget/components/switches/keypad.h \
     ./src/gui/circuitwidget/components/switches/mech_contact.h \
     ./src/gui/circuitwidget/components/switches/push.h \
@@ -467,6 +469,7 @@ SOURCES += \
     ./src/gui/QPropertyEditor/QPropertyModel.cpp \
     ./src/gui/QPropertyEditor/QVariantDelegate.cpp \
     ./src/gui/QPropertyEditor/propertieswidget.cpp \
+    ./src/gui/circuitwidget/addpartdialog.cpp \
     ./src/gui/circuitwidget/chip.cpp \
     ./src/gui/circuitwidget/circuit.cpp \
     ./src/gui/circuitwidget/circuitview.cpp \
@@ -558,6 +561,7 @@ SOURCES += \
     ./src/gui/circuitwidget/components/sources/rail.cpp \
     ./src/gui/circuitwidget/components/sources/voltsource.cpp \
     ./src/gui/circuitwidget/components/sources/wavegen.cpp \
+    ./src/gui/circuitwidget/components/switches/joystick.cpp \
     ./src/gui/circuitwidget/components/switches/keypad.cpp \
     ./src/gui/circuitwidget/components/switches/mech_contact.cpp \
     ./src/gui/circuitwidget/components/switches/push.cpp \

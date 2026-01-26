@@ -26,7 +26,6 @@
 
 #include <QtWidgets>
 
-
 class MAINMODULE_EXPORT CircuitWidget : public QWidget
 {
     Q_OBJECT
@@ -62,6 +61,7 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
     void about();
     void setDarkMode();
     void setLightMode();
+    void addPart();
 
   signals:
     void dataAvailable(int uart, const QByteArray &data);
@@ -90,6 +90,7 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
     QAction *aboutQtAct;
     QAction *darkModeAct;
     QAction *lightModeAct;
+    QAction *addPartAct;
 
     QMenu m_infoMenu;
 

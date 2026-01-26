@@ -212,7 +212,97 @@ void MainWindow::createWidgets()
     sizes << 150 << 350 << 500;
     m_Centralsplitter->setSizes(sizes);
 
+    connect(m_sidepanel, SIGNAL(currentChanged(int)), this,
+            SLOT(updateViewMenu(int)));
+
+    createMenus();
     this->showMaximized();
+}
+
+void MainWindow::updateViewMenu(int index)
+{
+    if (m_sidepanel->isHidden())
+        return;
+    compViewAct->setChecked(index == 0);
+    ramViewAct->setChecked(index == 1);
+    propViewAct->setChecked(index == 2);
+    fileViewAct->setChecked(index == 3);
+}
+
+void MainWindow::toggleSidePanel(bool show)
+{
+    QAction *action = qobject_cast<QAction *>(sender());
+    if (!action)
+        return;
+
+    int index = -1;
+    if (action == compViewAct)
+        index = 0;
+    else if (action == ramViewAct)
+        index = 1;
+    else if (action == propViewAct)
+        index = 2;
+    else if (action == fileViewAct)
+        index = 3;
+
+    if (index >= 0) {
+        if (show) {
+            // Uncheck others to avoid multiple visible (since it's a tab
+            // widget)
+            compViewAct->blockSignals(true);
+            ramViewAct->blockSignals(true);
+            propViewAct->blockSignals(true);
+            fileViewAct->blockSignals(true);
+
+            compViewAct->setChecked(index == 0);
+            ramViewAct->setChecked(index == 1);
+            propViewAct->setChecked(index == 2);
+            fileViewAct->setChecked(index == 3);
+
+            compViewAct->blockSignals(false);
+            ramViewAct->blockSignals(false);
+            propViewAct->blockSignals(false);
+            fileViewAct->blockSignals(false);
+
+            m_sidepanel->setCurrentIndex(index);
+            m_sidepanel->show();
+        } else {
+            m_sidepanel->hide();
+        }
+    }
+}
+
+void MainWindow::createMenus()
+{
+    QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
+
+    compViewAct = new QAction(tr("Components"), this);
+    compViewAct->setCheckable(true);
+    compViewAct->setChecked(true);
+    connect(compViewAct, SIGNAL(toggled(bool)), this,
+            SLOT(toggleSidePanel(bool)));
+    viewMenu->addAction(compViewAct);
+
+    ramViewAct = new QAction(tr("RamTable"), this);
+    ramViewAct->setCheckable(true);
+    ramViewAct->setChecked(true);
+    connect(ramViewAct, SIGNAL(toggled(bool)), this,
+            SLOT(toggleSidePanel(bool)));
+    viewMenu->addAction(ramViewAct);
+
+    propViewAct = new QAction(tr("Properties"), this);
+    propViewAct->setCheckable(true);
+    propViewAct->setChecked(true);
+    connect(propViewAct, SIGNAL(toggled(bool)), this,
+            SLOT(toggleSidePanel(bool)));
+    viewMenu->addAction(propViewAct);
+
+    fileViewAct = new QAction(tr("File Explorer"), this);
+    fileViewAct->setCheckable(true);
+    fileViewAct->setChecked(true);
+    connect(fileViewAct, SIGNAL(toggled(bool)), this,
+            SLOT(toggleSidePanel(bool)));
+    viewMenu->addAction(fileViewAct);
 }
 
 void MainWindow::loadCircHelp()
@@ -378,27 +468,14 @@ QSettings *MainWindow::settings()
 void MainWindow::setTheme(bool dark)
 {
     m_darkMode = dark;
-    if (dark) {
-        QPalette darkPalette;
-        darkPalette.setColor(QPalette::Window, QColor(53, 53, 53));
-        darkPalette.setColor(QPalette::WindowText, Qt::white);
-        darkPalette.setColor(QPalette::Base, QColor(25, 25, 25));
-        darkPalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-        darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
-        darkPalette.setColor(QPalette::ToolTipText, Qt::white);
-        darkPalette.setColor(QPalette::Text, Qt::white);
-        darkPalette.setColor(QPalette::Button, QColor(53, 53, 53));
-        darkPalette.setColor(QPalette::ButtonText, Qt::white);
-        darkPalette.setColor(QPalette::BrightText, Qt::red);
-        darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-        darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
-        darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-        qApp->setPalette(darkPalette);
-    } else {
-        qApp->setPalette(qApp->style()->standardPalette());
+    qApp->setPalette(qApp->style()->standardPalette());
+    if (Circuit::self()) {
+        for (Component *comp : *Circuit::self()->compList())
+            comp->updateLabelsTheme();
+        for (Component *comp : *Circuit::self()->conList())
+            comp->updateLabelsTheme();
+        Circuit::self()->update();
     }
-    if (m_circuit)
-        m_circuit->update();
 }
 
 #include "moc_mainwindow.cpp"

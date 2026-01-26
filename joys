@@ -1,0 +1,16 @@
+#define JOYSTICK_X A0   // Joystick X oxu A0 pininə qoşulub
+
+int xValue = 0;
+
+void setup() {
+  Serial.begin(9600);   // Serial Monitor üçün
+}
+
+void loop() {
+  xValue = analogRead(JOYSTICK_X);  // 0 - 1023 arası dəyər
+
+  Serial.print("Joystick X: ");
+  Serial.println(xValue);
+
+  delay(100); // oxuma intervalı
+}

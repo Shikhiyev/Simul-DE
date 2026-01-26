@@ -19,6 +19,7 @@
 
 #include "circuitwidget.h"
 
+#include "addpartdialog.h"
 #include "circuit.h"
 #include "filebrowser.h"
 #include "mainwindow.h"
@@ -130,6 +131,11 @@ void CircuitWidget::createActions()
     QActionGroup *themeGroup = new QActionGroup(this);
     themeGroup->addAction(darkModeAct);
     themeGroup->addAction(lightModeAct);
+
+    addPartAct = new QAction(QIcon(":/add.png"), tr("Add Component"), this);
+    addPartAct->setShortcut(QKeySequence(Qt::Key_A));
+    addPartAct->setStatusTip(tr("Open Component Selector"));
+    connect(addPartAct, SIGNAL(triggered()), this, SLOT(addPart()));
 }
 
 void CircuitWidget::createToolBars()
@@ -139,6 +145,8 @@ void CircuitWidget::createToolBars()
     m_circToolBar.addAction(openCircAct);
     m_circToolBar.addAction(saveCircAct);
     m_circToolBar.addAction(saveCircAsAct);
+    m_circToolBar.addSeparator(); //..........................
+    m_circToolBar.addAction(addPartAct);
     m_circToolBar.addSeparator(); //..........................
     m_circToolBar.addAction(powerCircAct);
     m_circToolBar.addAction(pauseSimAct);
@@ -151,6 +159,11 @@ void CircuitWidget::createToolBars()
     m_circToolBar.addWidget(spacerWidget);
 
     m_infoMenu.addAction(infoAct);
+    m_infoMenu.addSeparator();
+    m_infoMenu.addAction(MainWindow::self()->compViewAct);
+    m_infoMenu.addAction(MainWindow::self()->ramViewAct);
+    m_infoMenu.addAction(MainWindow::self()->propViewAct);
+    m_infoMenu.addAction(MainWindow::self()->fileViewAct);
     m_infoMenu.addSeparator();
     m_infoMenu.addAction(darkModeAct);
     m_infoMenu.addAction(lightModeAct);
@@ -365,6 +378,11 @@ void CircuitWidget::setLightMode()
     MainWindow::self()->setTheme(false);
     darkModeAct->setChecked(false);
     lightModeAct->setChecked(true);
+}
+
+void CircuitWidget::addPart()
+{
+    AddPartDialog::showAddPart(this);
 }
 
 #include "moc_circuitwidget.cpp"

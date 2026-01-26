@@ -1,0 +1,21 @@
+Joystick Module
+
+The Joystick component represents a standard analog module with 2 axes (X and Y) and an integrated push button (SW).
+
+Pins:
+- GND: Connect to Ground (0V).
+- 5V: Connect to VCC (+5V).
+- X: Analog output for X-axis (voltage varies from GND to VCC).
+- Y: Analog output for Y-axis (voltage varies from GND to VCC).
+- SW: Digital output for the integrated button. Connects to GND when pressed.
+
+Operation:
+- Drag the joystick handle with the Left Mouse Button to change X and Y values.
+- The handle will return to the center (500, 500) when released.
+- The Red color on the handle indicates that the button is being pressed during the drag.
+
+Properties:
+- Resistance: Total resistance of the internal potentiometers.
+- Pos_X: Current X position (0-1000).
+- Pos_Y: Current Y position (0-1000).
+- Pressed: Current button state.

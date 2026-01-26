@@ -78,6 +78,15 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
     QWidget *m_ramTabWidget;
     QGridLayout *m_ramTabWidgetLayout;
 
+    QAction *compViewAct;
+    QAction *ramViewAct;
+    QAction *propViewAct;
+    QAction *fileViewAct;
+
+  public slots:
+    void toggleSidePanel(bool show);
+    void updateViewMenu(int index);
+
   protected:
     void closeEvent(QCloseEvent *event);
 

@@ -32,7 +32,6 @@
 
 #include <QCoreApplication>
 
-
 static const char *Circuit_properties[] = {
     QT_TRANSLATE_NOOP("App::Property", "Speed"),
     QT_TRANSLATE_NOOP("App::Property", "ReactStep"),
@@ -69,8 +68,10 @@ Circuit::Circuit(qreal x, qreal y, qreal width, qreal height,
     new_connector = 0l;
     m_seqNumber   = 0;
 
-    m_hideGrid =
-        MainWindow::self()->settings()->value("Circuit/hideGrid").toBool();
+    m_hideGrid = MainWindow::self()
+                     ->settings()
+                     ->value("Circuit/hideGrid", true)
+                     .toBool();
     m_showScroll =
         MainWindow::self()->settings()->value("Circuit/showScroll").toBool();
     m_filePath = qApp->applicationDirPath() + "/new.simu";
@@ -1587,7 +1588,7 @@ void Circuit::drawBackground(QPainter *painter, const QRectF &rect)
     return;*/
 
     if (MainWindow::self()->isDarkMode()) {
-        painter->setBrush(QColor(30, 30, 30));
+        painter->setBrush(QColor(36, 37, 38)); // #242526
         painter->drawRect(m_scenerect);
         painter->setPen(QColor(60, 60, 60));
     } else {

@@ -1,0 +1,6 @@
+<circuit type="simulide_0.4" speed="1000000" reactStep="50" animate="0" noLinAcc="5">
+ 
+Arduino Uno-1: 
+<item Logic_Symbol="false" Program="" Auto_PcLink="false" hflip="1" valLabelx="0" id="Arduino Uno-1" labelrot="0" valLabRot="0" Init_gdb="false" Show_id="true" Mhz="16" eeprom="" PcLink_Port="" labelx="0" rotation="0" valLabely="0" Auto_Load="false" x="-100" labely="-20" y="-100" vflip="1" itemtype="Arduino" objectName="Arduino Uno-1" PcLink_Command=""/>
+ 
+</circuit>
