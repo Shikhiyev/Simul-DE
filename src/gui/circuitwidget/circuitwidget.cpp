@@ -24,7 +24,6 @@
 #include "filebrowser.h"
 #include "mainwindow.h"
 
-
 CircuitWidget *CircuitWidget::m_pSelf = 0l;
 
 CircuitWidget::CircuitWidget(QWidget *parent) :
@@ -40,7 +39,7 @@ CircuitWidget::CircuitWidget(QWidget *parent) :
     m_verticalLayout.setContentsMargins(0, 0, 0, 0);
     m_verticalLayout.setSpacing(0);
 
-    m_verticalLayout.addWidget(&m_circToolBar);
+    // m_verticalLayout.addWidget(&m_circToolBar);
     m_verticalLayout.addWidget(&m_circView);
 
     m_verticalLayout.addLayout(&m_horizontLayout);
@@ -149,7 +148,7 @@ void CircuitWidget::createToolBars()
     m_circToolBar.addAction(addPartAct);
     m_circToolBar.addSeparator(); //..........................
     m_circToolBar.addAction(powerCircAct);
-    m_circToolBar.addAction(pauseSimAct);
+    // m_circToolBar.addAction(pauseSimAct);
     m_circToolBar.addSeparator(); //..........................
     m_circToolBar.addWidget(m_rateLabel);
 

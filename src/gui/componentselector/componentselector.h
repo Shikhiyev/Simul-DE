@@ -20,60 +20,64 @@
 #ifndef COMPONENTSELECTOR_H
 #define COMPONENTSELECTOR_H
 
-#include <QtWidgets>
-
 #include "compplugindialog.h"
 #include "itemlibrary.h"
+
+#include <QtWidgets>
 
 class MAINMODULE_EXPORT ComponentSelector : public QTreeWidget
 {
     Q_OBJECT
-    
-    public:
-        ComponentSelector( QWidget* parent );
-        ~ComponentSelector();
 
- static ComponentSelector* self() { return m_pSelf; }
+  public:
+    ComponentSelector(QWidget *parent);
+    ~ComponentSelector();
 
-        void addLibraryItem( LibraryItem* libItem );
-        //void removeLibItem( LibraryItem* libItem );
+    static ComponentSelector *self()
+    {
+        return m_pSelf;
+    }
 
-        void LoadCompSetAt( QDir compSetDir );
-        void loadXml( const QString &setFile );
+    void addLibraryItem(LibraryItem *libItem);
+    // void removeLibItem( LibraryItem* libItem );
 
-        QString getXmlFile( QString compName );
+    void LoadCompSetAt(QDir compSetDir);
+    void loadXml(const QString &setFile);
 
-        void mouseReleaseEvent(QMouseEvent*);
+    QString getXmlFile(QString compName);
 
-    private slots:
-        void slotItemClicked( QTreeWidgetItem* item, int column );
-        void slotContextMenu(const QPoint&);
-        void slotManageComponents();
+    void mouseReleaseEvent(QMouseEvent *);
 
-    private:
- static ComponentSelector* m_pSelf;
+  protected:
+    QMimeData *mimeData(const QList<QTreeWidgetItem *> items) const;
 
-        void addItem( LibraryItem* libItem );
-        void addItem( const QString &caption,
-                      const QString &category,
-                      const QString &icon,
-                      const QString &type );
+  private slots:
+    void slotItemClicked(QTreeWidgetItem *item, int column);
+    void slotContextMenu(const QPoint &);
+    void slotManageComponents();
 
-        void LoadLibraryItems();
-        //void LoadCompSet();
-        //void istallPlugin( QString item );
-        //void unistallPlugin( QString item );
+  private:
+    static ComponentSelector *m_pSelf;
 
-        //void reLoadItems();
+    void addItem(LibraryItem *libItem);
+    void addItem(const QString &caption, const QString &category,
+                 const QString &icon, const QString &type);
 
-        QStringList m_compSetUnique;
-        QStringList m_categories;
-        //QString m_lastItemClicked;
-        QHash<QString, QString> m_xmlFileList;
+    void LoadLibraryItems();
+    // void LoadCompSet();
+    // void istallPlugin( QString item );
+    // void unistallPlugin( QString item );
 
-        CompPluginDialog m_pluginsdDialog;
+    // void reLoadItems();
 
-        ItemLibrary m_itemLibrary;
+    QStringList m_compSetUnique;
+    QStringList m_categories;
+    // QString m_lastItemClicked;
+    QHash<QString, QString> m_xmlFileList;
+
+    CompPluginDialog m_pluginsdDialog;
+
+    ItemLibrary m_itemLibrary;
 };
 
 #endif

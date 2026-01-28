@@ -170,50 +170,205 @@ void MainWindow::createWidgets()
     m_Centralsplitter->setObjectName("Centralsplitter");
     m_Centralsplitter->setOrientation(Qt::Horizontal);
 
-    m_sidepanel = new QTabWidget(this);
-    m_sidepanel->setObjectName("sidepanel");
-    m_sidepanel->setTabPosition(QTabWidget::West);
-    QString fontSize = QString::number(int(11 * m_fontScale));
-    m_sidepanel->tabBar()->setStyleSheet("QTabBar { font-size:" + fontSize +
-                                         "px; }");
-    m_Centralsplitter->addWidget(m_sidepanel);
+    // iconRail removed as requested
 
-    m_components = new ComponentSelector(m_sidepanel);
+    // --- Main Layout Structure ---
+    // [Icon Rail] [Splitter]
+
+    // 1. Components List (The "Categories" panel)
+    m_components = new ComponentSelector(this);
     m_components->setObjectName("components");
-    m_sidepanel->addTab(m_components, tr("Components"));
+    m_components->show(); // Make sure it's visible now
+    m_Centralsplitter->addWidget(m_components);
 
-    m_ramTabWidget = new QWidget(this);
-    m_ramTabWidget->setObjectName("ramTabWidget");
-    m_ramTabWidgetLayout = new QGridLayout(m_ramTabWidget);
-    m_ramTabWidgetLayout->setSpacing(0);
-    m_ramTabWidgetLayout->setContentsMargins(0, 0, 0, 0);
-    m_ramTabWidgetLayout->setObjectName("ramTabWidgetLayout");
-    m_sidepanel->addTab(m_ramTabWidget, tr("RamTable"));
-
-    m_itemprop = new PropertiesWidget(this);
-    m_itemprop->setObjectName("properties");
-    m_sidepanel->addTab(m_itemprop, tr("Properties"));
-
-    m_fileSystemTree = new FileWidget(this);
-    m_fileSystemTree->setObjectName("fileExplorer");
-    m_sidepanel->addTab(m_fileSystemTree, tr("File explorer"));
-
+    // 2. Circuit Canvas (Center)
     m_circuit = new CircuitWidget(this);
     m_circuit->setObjectName("circuit");
     m_Centralsplitter->addWidget(m_circuit);
 
+    // --- Header ---
+    QWidget *header = new QWidget(centralWidget);
+    header->setObjectName("header");
+    header->setFixedHeight(50);
+    header->setStyleSheet(
+        "QWidget#header { background-color: white; border-bottom: 1px solid "
+        "#e0e0e0; }");
+
+    QHBoxLayout *headerLayout = new QHBoxLayout(header);
+    headerLayout->setContentsMargins(15, 0, 15, 0);
+    headerLayout->setSpacing(8);
+
+    QLabel *logo = new QLabel(header);
+    logo->setPixmap(QIcon(":/simulide.png").pixmap(30, 30));
+    headerLayout->addWidget(logo);
+
+    headerLayout->addSpacing(15);
+
+    // -- File Operations Group --
+    auto createHeaderBtn = [&](const QString &icon, const QString &text = "",
+                               const QString &tooltip = "") {
+        QPushButton *btn = new QPushButton(header);
+        if (!text.isEmpty())
+            btn->setText(text);
+        btn->setIcon(QIcon(icon));
+        if (!tooltip.isEmpty())
+            btn->setToolTip(tooltip);
+
+        QString style =
+            "QPushButton { border: 1px solid #e0e0e0; border-radius: 6px; "
+            "background-color: white; color: #3c4043; font-size: 13px; "
+            "font-weight: 500; height: 32px; padding: 0 10px; } "
+            "QPushButton:hover { background-color: #f8f9fa; border-color: "
+            "#dadce0; } "
+            "QPushButton:pressed { background-color: #f1f3f4; }";
+        btn->setStyleSheet(style);
+        return btn;
+    };
+
+    QPushButton *newBtn =
+        createHeaderBtn(":/newcirc.png", "", tr("New Circuit"));
+    QPushButton *openBtn =
+        createHeaderBtn(":/opencirc.png", "", tr("Open Circuit"));
+    QPushButton *saveBtn = createHeaderBtn(":/savecirc.png", tr(" Save"));
+    QPushButton *saveAsBtn =
+        createHeaderBtn(":/savecircas.png", "", tr("Save Circuit As"));
+    headerLayout->addWidget(newBtn);
+    headerLayout->addWidget(openBtn);
+    headerLayout->addWidget(saveBtn);
+    headerLayout->addWidget(saveAsBtn);
+    headerLayout->addSpacing(10);
+
+    // Theme Selector (Light/Dark)
+    QPushButton *lightBtn = createHeaderBtn(":/settings.png", tr(" Light"));
+    QPushButton *darkBtn  = createHeaderBtn(":/settings.png", tr(" Dark"));
+
+    headerLayout->addWidget(lightBtn);
+    headerLayout->addWidget(darkBtn);
+
+    auto updateThemeStyles = [this, lightBtn, darkBtn]() {
+        bool dark = this->isDarkMode();
+        QString activeStyle =
+            "QPushButton { border: 2px solid #1a73e8; border-radius: 6px; "
+            "background-color: #e8f0fe; color: #1a73e8; font-size: 13px; "
+            "font-weight: bold; height: 32px; padding: 0 10px; }";
+        QString inactiveStyle =
+            "QPushButton { border: 1px solid #e0e0e0; border-radius: 6px; "
+            "background-color: white; color: #3c4043; font-size: 13px; "
+            "font-weight: 500; height: 32px; padding: 0 10px; } "
+            "QPushButton:hover { background-color: #f8f9fa; }";
+
+        lightBtn->setStyleSheet(!dark ? activeStyle : inactiveStyle);
+        darkBtn->setStyleSheet(dark ? activeStyle : inactiveStyle);
+    };
+    updateThemeStyles();
+
+    connect(lightBtn, &QPushButton::clicked, [this, updateThemeStyles]() {
+        setTheme(false);
+        updateThemeStyles();
+    });
+    connect(darkBtn, &QPushButton::clicked, [this, updateThemeStyles]() {
+        setTheme(true);
+        updateThemeStyles();
+    });
+
+    headerLayout->addStretch();
+
+    // Rate Label from CircuitWidget
+    QLabel *rateLabel = m_circuit->rateLabel();
+    if (rateLabel) {
+        rateLabel->setParent(header);
+        headerLayout->addWidget(rateLabel);
+    }
+
+    headerLayout->addStretch();
+
+    // Run Button (Special Style) - Toggles between Run/Pause
+    QPushButton *runBtn = new QPushButton(tr(" Run"), header);
+    runBtn->setIcon(QIcon(":/poweroff.png"));
+    runBtn->setFixedSize(85, 32);
+    runBtn->setStyleSheet(
+        "QPushButton { border: none; border-radius: 6px; background-color: "
+        "#1a73e8; color: white; font-size: 13px; font-weight: bold; } "
+        "QPushButton:hover { background-color: #1557b0; } "
+        "QPushButton:pressed { background-color: #174ea6; }");
+
+    headerLayout->addWidget(runBtn);
+
+    baseWidgetLayout->addWidget(header, 0, 0);
+    baseWidgetLayout->addWidget(m_Centralsplitter, 1, 0);
+
+    // Connect header buttons
+    connect(newBtn, SIGNAL(clicked()), m_circuit, SLOT(newCircuit()));
+    connect(openBtn, SIGNAL(clicked()), m_circuit, SLOT(openCirc()));
+    connect(saveBtn, SIGNAL(clicked()), m_circuit, SLOT(saveCirc()));
+    connect(saveAsBtn, SIGNAL(clicked()), m_circuit, SLOT(saveCircAs()));
+    connect(runBtn, &QPushButton::clicked, [this, runBtn]() {
+        if (runBtn->text().contains("Run")) {
+            if (Simulator::self()->isRunning() ||
+                Simulator::self()->isPaused()) {
+                m_circuit->pauseSim(); // This resumes if paused in my version
+                                       // or I can call resumeSim
+            } else {
+                m_circuit->powerCircOn();
+            }
+            runBtn->setText(tr(" Pause"));
+            runBtn->setIcon(QIcon(":/pausesim.png"));
+            runBtn->setStyleSheet(
+                "QPushButton { border: none; border-radius: 6px; "
+                "background-color: #fbbc05; "
+                "color: white; font-size: 13px; font-weight: bold; } "
+                "QPushButton:hover { background-color: #f2a600; }");
+        } else {
+            m_circuit->pauseSim();
+            runBtn->setText(tr(" Run"));
+            runBtn->setIcon(QIcon(":/poweroff.png"));
+            runBtn->setStyleSheet(
+                "QPushButton { border: none; border-radius: 6px; "
+                "background-color: #1a73e8; "
+                "color: white; font-size: 13px; font-weight: bold; } "
+                "QPushButton:hover { background-color: #1557b0; }");
+        }
+    });
+
+    // 3. Code Editor (Right)
     m_editor = new EditorWindow(this);
     m_editor->setObjectName(QString::fromUtf8("editor"));
     m_Centralsplitter->addWidget(m_editor);
 
-    baseWidgetLayout->addWidget(m_Centralsplitter, 0, 0);
-
+    // Set initial sizes to look like the image
     QList<int> sizes;
-    sizes << 150 << 350 << 500;
+    sizes << 250 << 600 << 400; // Components, Circuit, Editor
     m_Centralsplitter->setSizes(sizes);
+
+    // --- Styling ---
+    // Apply a global stylesheet to mimic the clean white/flat look
+    QString qss = R"(
+        QMainWindow { background-color: white; }
+        QSplitter::handle { background-color: #e0e0e0; width: 1px; }
+        QTreeWidget { border: none; background-color: #fafafa; }
+        QTreeWidget::item { padding: 5px; }
+        QWidget#circuit { background-color: #f5f5f5; } /* Dot grid handled by circuit drawing */
+    )";
+    this->setStyleSheet(qss);
+
+    // Old SidePanel stuff (Hidden/Unused)
+    m_sidepanel = new QTabWidget(this); // Keep instantiation to prevent crash
+                                        // if ref'd elsewhere, but hide
+    m_sidepanel->hide();
+
+    // These are initialized but hidden as requested
+    m_ramTabWidget       = new QWidget(this);
+    m_ramTabWidgetLayout = new QGridLayout(m_ramTabWidget);
+    m_ramTabWidget->hide();
+    m_itemprop = new PropertiesWidget(this);
+    m_itemprop->hide();
+    m_fileSystemTree = new FileWidget(this);
+    m_fileSystemTree->hide();
 
     connect(m_sidepanel, SIGNAL(currentChanged(int)), this,
             SLOT(updateViewMenu(int)));
+
+    m_sidepanel->hide();
 
     createMenus();
     this->showMaximized();
@@ -223,43 +378,45 @@ void MainWindow::updateViewMenu(int index)
 {
     if (m_sidepanel->isHidden())
         return;
-    compViewAct->setChecked(index == 0);
-    ramViewAct->setChecked(index == 1);
-    propViewAct->setChecked(index == 2);
-    fileViewAct->setChecked(index == 3);
+
+    /*// compViewAct->setChecked(index == 0);
+    ramViewAct->setChecked(index == 0);
+    propViewAct->setChecked(index == 1);
+    fileViewAct->setChecked(index == 2);*/
 }
 
 void MainWindow::toggleSidePanel(bool show)
 {
-    QAction *action = qobject_cast<QAction *>(sender());
+    /*QAction *action = qobject_cast<QAction *>(sender());
     if (!action)
         return;
 
     int index = -1;
-    if (action == compViewAct)
+    //if (action == compViewAct)
+    //    index = 0;
+    //else
+    if (action == ramViewAct)
         index = 0;
-    else if (action == ramViewAct)
-        index = 1;
     else if (action == propViewAct)
-        index = 2;
+        index = 1;
     else if (action == fileViewAct)
-        index = 3;
+        index = 2;
 
     if (index >= 0) {
         if (show) {
             // Uncheck others to avoid multiple visible (since it's a tab
             // widget)
-            compViewAct->blockSignals(true);
+            // compViewAct->blockSignals(true);
             ramViewAct->blockSignals(true);
             propViewAct->blockSignals(true);
             fileViewAct->blockSignals(true);
 
-            compViewAct->setChecked(index == 0);
-            ramViewAct->setChecked(index == 1);
-            propViewAct->setChecked(index == 2);
-            fileViewAct->setChecked(index == 3);
+            // compViewAct->setChecked(index == 0);
+            ramViewAct->setChecked(index == 0);
+            propViewAct->setChecked(index == 1);
+            fileViewAct->setChecked(index == 2);
 
-            compViewAct->blockSignals(false);
+            // compViewAct->blockSignals(false);
             ramViewAct->blockSignals(false);
             propViewAct->blockSignals(false);
             fileViewAct->blockSignals(false);
@@ -269,19 +426,19 @@ void MainWindow::toggleSidePanel(bool show)
         } else {
             m_sidepanel->hide();
         }
-    }
+    }*/
 }
 
 void MainWindow::createMenus()
 {
-    QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
+    /*QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
 
-    compViewAct = new QAction(tr("Components"), this);
-    compViewAct->setCheckable(true);
-    compViewAct->setChecked(true);
-    connect(compViewAct, SIGNAL(toggled(bool)), this,
-            SLOT(toggleSidePanel(bool)));
-    viewMenu->addAction(compViewAct);
+    //compViewAct = new QAction(tr("Components"), this);
+    //compViewAct->setCheckable(true);
+    //compViewAct->setChecked(true);
+    //connect(compViewAct, SIGNAL(toggled(bool)), this,
+    //        SLOT(toggleSidePanel(bool)));
+    //viewMenu->addAction(compViewAct);
 
     ramViewAct = new QAction(tr("RamTable"), this);
     ramViewAct->setCheckable(true);
@@ -302,7 +459,7 @@ void MainWindow::createMenus()
     fileViewAct->setChecked(true);
     connect(fileViewAct, SIGNAL(toggled(bool)), this,
             SLOT(toggleSidePanel(bool)));
-    viewMenu->addAction(fileViewAct);
+    viewMenu->addAction(fileViewAct);*/
 }
 
 void MainWindow::loadCircHelp()

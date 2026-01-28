@@ -49,6 +49,11 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
     void powerCircOff();
     void powerCircDebug(bool run);
 
+    QLabel *rateLabel()
+    {
+        return m_rateLabel;
+    }
+
   public slots:
     bool newCircuit();
     void openCirc();

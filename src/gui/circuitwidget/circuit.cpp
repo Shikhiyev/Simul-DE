@@ -70,7 +70,7 @@ Circuit::Circuit(qreal x, qreal y, qreal width, qreal height,
 
     m_hideGrid = MainWindow::self()
                      ->settings()
-                     ->value("Circuit/hideGrid", true)
+                     ->value("Circuit/hideGrid", false)
                      .toBool();
     m_showScroll =
         MainWindow::self()->settings()->value("Circuit/showScroll").toBool();
@@ -1582,36 +1582,33 @@ void Circuit::dropEvent(QGraphicsSceneDragDropEvent *event)
 
 void Circuit::drawBackground(QPainter *painter, const QRectF &rect)
 {
-    Q_UNUSED(rect);
-    /*painter->setBrush(QColor( 255, 255, 255 ) );
-    painter->drawRect( m_scenerect );
-    return;*/
-
+    // Draw background color
     if (MainWindow::self()->isDarkMode()) {
-        painter->setBrush(QColor(36, 37, 38)); // #242526
-        painter->drawRect(m_scenerect);
+        painter->fillRect(rect, QColor(36, 37, 38));
         painter->setPen(QColor(60, 60, 60));
     } else {
-        painter->setBrush(QColor(240, 240, 210));
-        painter->drawRect(m_scenerect);
-        painter->setPen(QColor(210, 210, 210));
+        painter->fillRect(rect, QColor(245, 245, 245));    // #f5f5f5
+        painter->setPen(QPen(QColor(200, 200, 200), 1.5)); // Dot color
     }
 
     if (m_hideGrid)
         return;
 
-    int startx = int(m_scenerect.x()); /// 2;
-    int endx   = int(m_scenerect.width()) / 2;
-    int starty = int(m_scenerect.y()); /// 2;
-    int endy   = int(m_scenerect.height()) / 2;
+    qreal gridSize = 10;
 
-    for (int i = 4; i < endx; i += 8) {
-        painter->drawLine(i, starty, i, endy);
-        painter->drawLine(-i, starty, -i, endy);
-    }
-    for (int i = 4; i < endy; i += 8) {
-        painter->drawLine(startx, i, endx, i);
-        painter->drawLine(startx, -i, endx, -i);
+    qreal left   = rect.left();
+    qreal top    = rect.top();
+    qreal right  = rect.right();
+    qreal bottom = rect.bottom();
+
+    // Snap start coordinates to grid
+    qreal firstX = floor(left / gridSize) * gridSize;
+    qreal firstY = floor(top / gridSize) * gridSize;
+
+    for (qreal x = firstX; x < right; x += gridSize) {
+        for (qreal y = firstY; y < bottom; y += gridSize) {
+            painter->drawPoint(x, y);
+        }
     }
 }
 

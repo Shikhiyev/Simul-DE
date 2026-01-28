@@ -19,7 +19,6 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 
-
 ComponentTile::ComponentTile(const PartItem &item, QWidget *parent) :
     QFrame(parent), m_item(item)
 {

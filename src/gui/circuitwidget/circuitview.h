@@ -22,7 +22,6 @@
 
 #include <QtWidgets>
 
-
 class Component;
 class Circuit;
 
@@ -30,43 +29,46 @@ class CircuitView : public QGraphicsView
 {
     Q_OBJECT
 
-    public:
-        CircuitView( QWidget *parent );
-        ~CircuitView();
+  public:
+    CircuitView(QWidget *parent);
+    ~CircuitView();
 
- static CircuitView* self() { return m_pSelf; }
- 
-        void clear();
-        
-        void wheelEvent( QWheelEvent *event );
-        void dragMoveEvent( QDragMoveEvent* event );
-        void dragEnterEvent( QDragEnterEvent* event );
-        void dragLeaveEvent( QDragLeaveEvent* event );
+    static CircuitView *self()
+    {
+        return m_pSelf;
+    }
 
-        void mousePressEvent( QMouseEvent* event );
-        void mouseReleaseEvent( QMouseEvent* event );
+    void clear();
 
-        void resizeEvent( QResizeEvent* event );
-        
-        void setCircTime( uint64_t step);
+    void wheelEvent(QWheelEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragLeaveEvent(QDragLeaveEvent *event);
 
-    public slots:
-        void saveImage();
-        void slotPaste();
-        void importCirc();
-        
-    protected:
-        void contextMenuEvent( QContextMenuEvent* event );
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 
-    private:
- static CircuitView*  m_pSelf;
- 
-        QPlainTextEdit* m_info;
- 
-        Component*  m_enterItem;
-        Circuit*    m_circuit;
+    void resizeEvent(QResizeEvent *event);
 
-        QPointF m_eventpoint;
+    void setCircTime(uint64_t step);
+
+  public slots:
+    void saveImage();
+    void slotPaste();
+    void importCirc();
+
+  protected:
+    void contextMenuEvent(QContextMenuEvent *event);
+
+  private:
+    static CircuitView *m_pSelf;
+
+    QPlainTextEdit *m_info;
+
+    Component *m_enterItem;
+    Circuit *m_circuit;
+
+    QPointF m_eventpoint;
 };
 
 #endif
