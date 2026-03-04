@@ -282,16 +282,28 @@ void MainWindow::createWidgets()
 
     headerLayout->addStretch();
 
-    // Run Button (Special Style) - Toggles between Run/Pause
+    // Run Button (Toggles between Run/Pause)
     QPushButton *runBtn = new QPushButton(tr(" Run"), header);
     runBtn->setIcon(QIcon(":/poweroff.png"));
     runBtn->setFixedSize(85, 32);
+
+    // Stop Button (Powers off the circuit)
+    QPushButton *stopBtn = new QPushButton(tr(" Stop"), header);
+    stopBtn->setIcon(
+        QIcon(":/poweroff.png")); // Using same icon but different color
+    stopBtn->setFixedSize(85, 32);
+    QString stopStyle =
+        "QPushButton { border: none; border-radius: 6px; background-color: "
+        "#ea4335; color: white; font-size: 13px; font-weight: bold; } "
+        "QPushButton:hover { background-color: #d93025; }";
+    stopBtn->setStyleSheet(stopStyle);
     runBtn->setStyleSheet(
         "QPushButton { border: none; border-radius: 6px; background-color: "
         "#1a73e8; color: white; font-size: 13px; font-weight: bold; } "
         "QPushButton:hover { background-color: #1557b0; } "
         "QPushButton:pressed { background-color: #174ea6; }");
 
+    headerLayout->addWidget(stopBtn);
     headerLayout->addWidget(runBtn);
 
     baseWidgetLayout->addWidget(header, 0, 0);
@@ -302,32 +314,41 @@ void MainWindow::createWidgets()
     connect(openBtn, SIGNAL(clicked()), m_circuit, SLOT(openCirc()));
     connect(saveBtn, SIGNAL(clicked()), m_circuit, SLOT(saveCirc()));
     connect(saveAsBtn, SIGNAL(clicked()), m_circuit, SLOT(saveCircAs()));
-    connect(runBtn, &QPushButton::clicked, [this, runBtn]() {
-        if (runBtn->text().contains("Run")) {
-            if (Simulator::self()->isRunning() ||
-                Simulator::self()->isPaused()) {
-                m_circuit->pauseSim(); // This resumes if paused in my version
-                                       // or I can call resumeSim
-            } else {
-                m_circuit->powerCircOn();
-            }
+    auto updateRunBtnStyle = [this, runBtn]() {
+        bool running = Simulator::self()->isRunning();
+        bool paused  = Simulator::self()->isPaused();
+
+        if (running && !paused) {
             runBtn->setText(tr(" Pause"));
             runBtn->setIcon(QIcon(":/pausesim.png"));
             runBtn->setStyleSheet(
                 "QPushButton { border: none; border-radius: 6px; "
-                "background-color: #fbbc05; "
-                "color: white; font-size: 13px; font-weight: bold; } "
+                "background-color: #fbbc05; color: white; font-size: 13px; "
+                "font-weight: bold; } "
                 "QPushButton:hover { background-color: #f2a600; }");
         } else {
-            m_circuit->pauseSim();
             runBtn->setText(tr(" Run"));
             runBtn->setIcon(QIcon(":/poweroff.png"));
             runBtn->setStyleSheet(
                 "QPushButton { border: none; border-radius: 6px; "
-                "background-color: #1a73e8; "
-                "color: white; font-size: 13px; font-weight: bold; } "
+                "background-color: #1a73e8; color: white; font-size: 13px; "
+                "font-weight: bold; } "
                 "QPushButton:hover { background-color: #1557b0; }");
         }
+    };
+
+    connect(runBtn, &QPushButton::clicked, [this, updateRunBtnStyle]() {
+        if (!Simulator::self()->isRunning() && !Simulator::self()->isPaused()) {
+            m_circuit->powerCircOn();
+        } else {
+            m_circuit->pauseSim();
+        }
+        updateRunBtnStyle();
+    });
+
+    connect(stopBtn, &QPushButton::clicked, [this, updateRunBtnStyle]() {
+        m_circuit->powerCircOff();
+        updateRunBtnStyle();
     });
 
     // 3. Code Editor (Right)

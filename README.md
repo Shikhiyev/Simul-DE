@@ -10,30 +10,22 @@ SimulIDE Community Edition is a fork of SimulIDE software, a simple real time el
 
 Build dependencies:
 
- - Qt5 dev packages
- - Qt5Core
- - Qt5Gui
- - Qt5Xml
- - Qt5Widgets
- - Qt5Concurrent
- - Qt5svg dev
- - Qt5 Multimedia dev
- - Qt5 Serialport dev
- - Qt5 Script
- - Qt5 qmake
+ - Qt5/Qt6 dev packages
  - libelf-dev
- - gcc-avr
- - avr-libc
 
- 
-Once installed:
+### Linux
 
-```
+Once dependencies are installed:
+```bash
 mkdir build
 cd build
 qmake ..
 make
 ```
+
+### Windows
+
+For building on Windows with **Qt Creator**, please see our **[Windows Build Guide](BUILD_WINDOWS.md)**.
 
 In the folder `build/release/SimulIDE_x.x.x` you will find the executable and all the files needed to run SimulIDE. SimulIDE executable is in bin folder. No need for installation, place SimulIDE folder wherever you want and run the executable.
 

@@ -20,12 +20,24 @@
 
 #include <sys/stat.h>
 #include <fcntl.h>
+#ifndef _WIN32
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <libelf.h>
 #include <gelf.h>
+#else
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <io.h>
+#include <process.h>
+#define read _read
+#define open _open
+#define close _close
+// We will need to address libelf.h missing on Windows separately
+#endif
 
 #include "sim_elf.h"
 #include "sim_vcd_file.h"
